@@ -3,6 +3,8 @@ import os
 import json
 import xml.etree.ElementTree as et
 import requests
+import shutil
+
 
 
 def unzip():
@@ -19,7 +21,6 @@ def unzip():
 
     with open(lef_file_path, 'r') as file:
         xml_data = file.read()
-        os.rmdir(temp_dir)
         return xml_data
 
 def extract_athlete_info(athlete_element):
@@ -65,3 +66,4 @@ if __name__ == '__main__':
 
     make_request(licenses)
 
+    shutil.rmtree('temp_extracted')
