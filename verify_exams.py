@@ -1,44 +1,33 @@
-import xml.etree.ElementTree as et
 from flask import Flask, request, jsonify
+from datetime import datetime, timedelta
+import random
 
 app = Flask(__name__)
 
-# parse XML data
-def parse_file_content(file_data):
-    root = et.fromstring(file_data)
-    return root
+def random_date():
+    today = datetime.now()
+    start_date = today - timedelta(days=365)
+    end_date = today + timedelta(days=365)
+    random_date = start_date + timedelta(days=random.randint(0, (end_date - start_date).days))
 
-# extract athelete information
-def extract_athlete_info(athlete_element):
-    return {
-        'athleteid': athlete_element.get('athleteid'),
-        'lastname': athlete_element.get('lastname'),
-        'firstname': athlete_element.get('firstname'),
-        'gender': athlete_element.get('gender'),
-        'license': athlete_element.get('license'),
-        'birthdate': athlete_element.get('birthdate')
-    }
+    return random_date.strftime('%d-%m-%Y')
 
-# simulate medical exam verification, return true if year of birth >= 2005
-def sim_exam(athlete):
-    valid_exam = int(athlete['birthdate'].split('-')[0]) >= 2005
-    return valid_exam
 
 # API endpoint
-@app.route('/verify-exams', methods=['POST'])
+@app.route('/validate_licenses', methods=['POST'])
 def verify_exams():
     try:
-        file_data = request.data
-        root = parse_file_content(file_data)
+        data = request.json
 
-        athletes = []
-        for athlete_element in root.findall('.//ATHLETE'):
-            athlete_info = extract_athlete_info(athlete_element)
-            athlete_info['valid_exam'] = sim_exam(athlete_info) #adiciona um campo chamado 'valid_exam' à informacao do atleta
-            athletes.append(athlete_info)
+        print(data)
 
-        return jsonify({'athletes': athletes}), 200
-    
+        if 'licenses' in data and isinstance(data['licenses'], list):
+            licenses = data['licenses']
+            random_dates = {license_number: random_date() for license_number in licenses}
+            return jsonify(random_dates)
+        else:
+            return jsonify({'error': 'Invalid input format'}), 400
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 400
     
