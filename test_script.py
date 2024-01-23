@@ -43,12 +43,19 @@ def get_licenses(root):
     return licenses
 
 def make_request(licenses):
-    url = 'http://127.0.0.1:5000/validate_licenses'
+    #url = 'http://127.0.0.1:5000/validate_licenses'
+    url = 'https://fpnsystem.fpnatacao.pt/api/exam'
+
+    #headers = {'Content-Type': 'application/json'}
+    headers = {}
 
     json_licenses = {'licenses': licenses}
-    headers = {'Content-Type': 'application/json'}
+    
+    auth = ("validexam@fpnatacao.pt", "#LH26pZNDlJ)")
 
-    response = requests.post(url, data = json.dumps(json_licenses), headers=headers)
+    response = requests.post(url, headers=headers, json = json_licenses, auth=auth) #data = json.dumps(json_licenses)
+
+    print(response.status_code)
 
     if response.status_code == 200:
         result = response.json()
